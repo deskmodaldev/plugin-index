@@ -65,7 +65,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "service-price-feed",
+    "repo": "price-feed-service",
     "name": "Price Feed Service",
     "description": "Exchange connectivity, tick normalization, and FDC3 price distribution",
     "categories": ["Services"],
@@ -73,9 +73,9 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "service-alert-engine",
-    "name": "Alert Engine Service",
-    "description": "Price alert evaluation, condition monitoring, and notification dispatch",
+    "repo": "paper-trading",
+    "name": "Paper Trading Engine",
+    "description": "Simulated order execution, positions tracking, P&L calculation, and execution analytics",
     "categories": ["Services"],
     "featured": false
   }
