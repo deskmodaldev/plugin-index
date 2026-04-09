@@ -1,0 +1,82 @@
+[
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-feeds",
+    "name": "TradeSurface Feeds",
+    "description": "Real-time multi-exchange price feeds with WebSocket streaming",
+    "categories": ["Data"],
+    "featured": true
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-chart",
+    "name": "TradeSurface Chart",
+    "description": "Advanced multi-asset charting with 50+ indicators and drawing tools",
+    "categories": ["Charting"],
+    "featured": true
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-watchlist",
+    "name": "TradeSurface Watchlist",
+    "description": "Multi-exchange watchlist with streaming quotes and sections",
+    "categories": ["Trading"],
+    "featured": true
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-depth",
+    "name": "TradeSurface Depth",
+    "description": "Cross-exchange order book depth visualization with aggregation",
+    "categories": ["Trading"],
+    "featured": false
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-analytics",
+    "name": "TradeSurface Analytics",
+    "description": "Market analytics, correlation analysis, and cross-exchange metrics",
+    "categories": ["Analytics"],
+    "featured": false
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-screener",
+    "name": "TradeSurface Screener",
+    "description": "Real-time market screener with custom filters and sorting",
+    "categories": ["Trading"],
+    "featured": false
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-alerts",
+    "name": "TradeSurface Alerts",
+    "description": "Price alerts and condition monitoring with notification delivery",
+    "categories": ["Trading"],
+    "featured": false
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "plugin-tradesurface-trading",
+    "name": "TradeSurface Trading",
+    "description": "Order ticket, blotter, and positions management",
+    "categories": ["Trading"],
+    "featured": true
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "service-price-feed",
+    "name": "Price Feed Service",
+    "description": "Exchange connectivity, tick normalization, and FDC3 price distribution",
+    "categories": ["Services"],
+    "featured": false
+  },
+  {
+    "owner": "deskmodaldev",
+    "repo": "service-alert-engine",
+    "name": "Alert Engine Service",
+    "description": "Price alert evaluation, condition monitoring, and notification dispatch",
+    "categories": ["Services"],
+    "featured": false
+  }
+]

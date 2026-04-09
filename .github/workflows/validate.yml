@@ -1,0 +1,58 @@
+name: Validate Plugin Index
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON is parseable
+        run: python3 -c "import json, sys; json.load(open('plugin-index.json'))" || { echo "Invalid JSON"; exit 1; }
+
+      - name: Check required fields and no duplicates
+        run: |
+          python3 <<'SCRIPT'
+          import json, sys
+
+          with open("plugin-index.json") as f:
+              plugins = json.load(f)
+
+          if not isinstance(plugins, list):
+              print("ERROR: plugin-index.json must be a JSON array")
+              sys.exit(1)
+
+          required_fields = ["owner", "repo", "name", "description", "categories", "featured"]
+          seen = set()
+          errors = []
+
+          for i, entry in enumerate(plugins):
+              for field in required_fields:
+                  if field not in entry:
+                      errors.append(f"Entry {i}: missing required field '{field}'")
+
+              if "owner" in entry and "repo" in entry:
+                  key = f"{entry['owner']}/{entry['repo']}"
+                  if key in seen:
+                      errors.append(f"Entry {i}: duplicate owner/repo '{key}'")
+                  seen.add(key)
+
+              if "categories" in entry:
+                  if not isinstance(entry["categories"], list) or len(entry["categories"]) == 0:
+                      errors.append(f"Entry {i}: 'categories' must be a non-empty array")
+
+              if "featured" in entry and not isinstance(entry["featured"], bool):
+                  errors.append(f"Entry {i}: 'featured' must be a boolean")
+
+          if errors:
+              for e in errors:
+                  print(f"ERROR: {e}")
+              sys.exit(1)
+
+          print(f"OK: {len(plugins)} plugins validated, {len(seen)} unique repos")
+          SCRIPT
