@@ -1,7 +1,7 @@
 [
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-feeds",
+    "repo": "tradesurface",
     "name": "TradeSurface Feeds",
     "description": "Real-time multi-exchange price feeds with WebSocket streaming",
     "categories": ["Data"],
@@ -9,7 +9,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-chart",
+    "repo": "tradesurface",
     "name": "TradeSurface Chart",
     "description": "Advanced multi-asset charting with 50+ indicators and drawing tools",
     "categories": ["Charting"],
@@ -17,7 +17,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-watchlist",
+    "repo": "tradesurface",
     "name": "TradeSurface Watchlist",
     "description": "Multi-exchange watchlist with streaming quotes and sections",
     "categories": ["Trading"],
@@ -25,7 +25,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-depth",
+    "repo": "tradesurface",
     "name": "TradeSurface Depth",
     "description": "Cross-exchange order book depth visualization with aggregation",
     "categories": ["Trading"],
@@ -33,7 +33,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-analytics",
+    "repo": "tradesurface",
     "name": "TradeSurface Analytics",
     "description": "Market analytics, correlation analysis, and cross-exchange metrics",
     "categories": ["Analytics"],
@@ -41,7 +41,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-screener",
+    "repo": "tradesurface",
     "name": "TradeSurface Screener",
     "description": "Real-time market screener with custom filters and sorting",
     "categories": ["Trading"],
@@ -49,7 +49,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-alerts",
+    "repo": "tradesurface",
     "name": "TradeSurface Alerts",
     "description": "Price alerts and condition monitoring with notification delivery",
     "categories": ["Trading"],
@@ -57,7 +57,7 @@
   },
   {
     "owner": "deskmodaldev",
-    "repo": "plugin-tradesurface-trading",
+    "repo": "tradesurface",
     "name": "TradeSurface Trading",
     "description": "Order ticket, blotter, and positions management",
     "categories": ["Trading"],
