@@ -1,0 +1,202 @@
+name: Cache cleanup
+
+# Prevents the GitHub Actions cache from bloating past the 10 GB per-repo
+# limit. Without periodic cleanup, rust-cache and sccache entries
+# accumulate across runs and GitHub starts silently evicting the oldest
+# on every save — which manifests as random cache misses and flaky CI.
+#
+# What this workflow deletes:
+#   1. Every cache entry on a `refs/pull/<N>/merge` ref where the PR is
+#      closed or merged — those caches are orphaned the moment the PR
+#      resolves.
+#   2. Duplicate entries with the same key prefix (e.g., two
+#      `v0-rust-build-windows-x64-*` entries), keeping the most recent.
+#   3. Any entry that hasn't been accessed in > KEEP_DAYS days.
+#
+# What it NEVER deletes:
+#   - Entries on `refs/heads/main` that are the most recent for their key
+#     (those are the hot path for push-to-main CI).
+#   - Anything accessed within the last 3 days (hot cache).
+
+on:
+  schedule:
+    # Every Monday 04:00 UTC. Pick a time when no one's pushing so the
+    # cleanup doesn't race with an active rust-cache save.
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview deletions without actually deleting"
+        type: boolean
+        default: false
+      keep_days:
+        description: "Delete entries not accessed in this many days"
+        type: number
+        default: 7
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: cache-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: "Prune stale Actions caches"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          KEEP_DAYS: ${{ github.event.inputs.keep_days || '7' }}
+        with:
+          script: |
+            const dryRun = process.env.DRY_RUN === 'true';
+            const keepDays = parseInt(process.env.KEEP_DAYS, 10);
+            const cutoff = new Date(Date.now() - keepDays * 24 * 60 * 60 * 1000);
+
+            core.info(`Mode: ${dryRun ? 'DRY RUN (no deletions)' : 'LIVE'}`);
+            core.info(`Cutoff: ${cutoff.toISOString()} (keep_days=${keepDays})`);
+
+            // ----------------------------------------------------------------
+            // Fetch all caches.
+            // ----------------------------------------------------------------
+            const allCaches = [];
+            let page = 1;
+            while (true) {
+              const res = await github.rest.actions.getActionsCacheList({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+                page,
+              });
+              allCaches.push(...res.data.actions_caches);
+              if (res.data.actions_caches.length < 100) break;
+              page++;
+            }
+            const totalBytes = allCaches.reduce((a, c) => a + c.size_in_bytes, 0);
+            core.info(`Found ${allCaches.length} caches totalling ${(totalBytes / 1024 / 1024 / 1024).toFixed(2)} GB`);
+
+            // ----------------------------------------------------------------
+            // Fetch all open PRs so we know which refs/pull/*/merge caches
+            // are still live and must not be deleted.
+            // ----------------------------------------------------------------
+            const openPRs = new Set();
+            for (const state of ['open']) {
+              let prPage = 1;
+              while (true) {
+                const res = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state,
+                  per_page: 100,
+                  page: prPage,
+                });
+                res.data.forEach(pr => openPRs.add(pr.number));
+                if (res.data.length < 100) break;
+                prPage++;
+              }
+            }
+            core.info(`Open PRs: ${[...openPRs].join(', ') || '(none)'}`);
+
+            // ----------------------------------------------------------------
+            // Classify each cache.
+            // ----------------------------------------------------------------
+            const toDelete = [];
+            const keep = [];
+
+            // Track the most-recent entry per (ref, keyPrefix) tuple so we
+            // can drop older duplicates. Key prefix is the first 3 hyphen-
+            // separated segments of the key (e.g., `v0-rust-build-windows-x64`)
+            // which matches rust-cache's stable naming.
+            const newestPerKey = new Map();
+            for (const c of allCaches) {
+              const keyPrefix = c.key.split('-').slice(0, 4).join('-');
+              const mapKey = `${c.ref}::${keyPrefix}`;
+              const prev = newestPerKey.get(mapKey);
+              if (!prev || new Date(c.last_accessed_at) > new Date(prev.last_accessed_at)) {
+                newestPerKey.set(mapKey, c);
+              }
+            }
+
+            for (const c of allCaches) {
+              const reason = [];
+
+              // Rule 1: closed/merged PR refs
+              const prMatch = c.ref.match(/^refs\/pull\/(\d+)\/merge$/);
+              if (prMatch && !openPRs.has(parseInt(prMatch[1], 10))) {
+                reason.push(`PR #${prMatch[1]} not open`);
+              }
+
+              // Rule 2: not the newest for its (ref, keyPrefix)
+              const keyPrefix = c.key.split('-').slice(0, 4).join('-');
+              const newest = newestPerKey.get(`${c.ref}::${keyPrefix}`);
+              if (newest && newest.id !== c.id) {
+                reason.push(`duplicate (newer exists)`);
+              }
+
+              // Rule 3: last accessed before cutoff
+              if (new Date(c.last_accessed_at) < cutoff) {
+                reason.push(`stale (> ${keepDays}d idle)`);
+              }
+
+              if (reason.length) {
+                toDelete.push({ cache: c, reason: reason.join(', ') });
+              } else {
+                keep.push(c);
+              }
+            }
+
+            // ----------------------------------------------------------------
+            // Report.
+            // ----------------------------------------------------------------
+            const delBytes = toDelete.reduce((a, x) => a + x.cache.size_in_bytes, 0);
+            core.info('');
+            core.info(`Keeping  ${keep.length} caches (${(keep.reduce((a, c) => a + c.size_in_bytes, 0) / 1024 / 1024 / 1024).toFixed(2)} GB)`);
+            core.info(`Deleting ${toDelete.length} caches (${(delBytes / 1024 / 1024 / 1024).toFixed(2)} GB)`);
+            for (const { cache, reason } of toDelete) {
+              const sizeMB = (cache.size_in_bytes / 1024 / 1024).toFixed(0);
+              core.info(`  - [${sizeMB.padStart(6)} MB] ${cache.ref.padEnd(25)} ${cache.key.slice(0, 60).padEnd(60)} :: ${reason}`);
+            }
+
+            if (dryRun) {
+              core.info('');
+              core.info('Dry run complete. No caches deleted.');
+              return;
+            }
+
+            // ----------------------------------------------------------------
+            // Delete.
+            // ----------------------------------------------------------------
+            let ok = 0, fail = 0;
+            for (const { cache } of toDelete) {
+              try {
+                await github.rest.actions.deleteActionsCacheById({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  cache_id: cache.id,
+                });
+                ok++;
+              } catch (e) {
+                core.warning(`Failed to delete cache ${cache.id} (${cache.key}): ${e.message}`);
+                fail++;
+              }
+            }
+            core.info('');
+            core.info(`Deleted ${ok} caches, ${fail} failures.`);
+
+            // Summary on the run page
+            await core.summary
+              .addHeading('Cache cleanup result')
+              .addTable([
+                [{data: 'Metric', header: true}, {data: 'Value', header: true}],
+                ['Caches inspected', String(allCaches.length)],
+                ['Kept', String(keep.length)],
+                ['Deleted', String(ok)],
+                ['Deletion failures', String(fail)],
+                ['Bytes freed', `${(delBytes / 1024 / 1024 / 1024).toFixed(2)} GB`],
+              ])
+              .write();
