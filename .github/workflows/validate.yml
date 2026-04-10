@@ -7,8 +7,37 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # ---------------------------------------------------------------------------
+  # Path filter — only run validation when the index file (or the
+  # workflow itself) changes. README edits shouldn't burn CI minutes.
+  # ---------------------------------------------------------------------------
+  changes:
+    name: "Detect changes"
+    runs-on: ubuntu-latest
+    outputs:
+      index: ${{ steps.filter.outputs.index }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            index:
+              - 'plugin-index.json'
+            workflows:
+              - '.github/workflows/**'
+
   validate:
+    needs: [changes]
+    if: needs.changes.outputs.index == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,3 +86,33 @@ jobs:
 
           print(f"OK: {len(plugins)} plugins validated, {len(seen)} unique repos")
           SCRIPT
+
+  # ---------------------------------------------------------------------------
+  # Aggregator — single required status check for branch protection.
+  # ---------------------------------------------------------------------------
+  ci-all-green:
+    name: "CI: all green"
+    needs: [changes, validate]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all gate jobs succeeded or were skipped
+        shell: bash
+        run: |
+          fail=0
+          check() {
+            case "$2" in
+              success|skipped) echo "  ✓ $1 ($2)" ;;
+              *) echo "  ✗ $1 ($2)"; fail=1 ;;
+            esac
+          }
+          echo "Gate job results for commit ${GITHUB_SHA:0:7}:"
+          check "changes"  "${{ needs.changes.result }}"
+          check "validate" "${{ needs.validate.result }}"
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "One or more required CI jobs failed."
+            exit 1
+          fi
+          echo ""
+          echo "All required CI jobs succeeded or were correctly skipped."
