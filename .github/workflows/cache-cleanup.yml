@@ -48,7 +48,7 @@ jobs:
     name: "Prune stale Actions caches"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           KEEP_DAYS: ${{ github.event.inputs.keep_days || '7' }}
