@@ -23,7 +23,7 @@ jobs:
       index: ${{ steps.filter.outputs.index }}
       workflows: ${{ steps.filter.outputs.workflows }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
       - uses: dorny/paths-filter@v3
@@ -40,7 +40,7 @@ jobs:
     if: needs.changes.outputs.index == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate JSON is parseable
         run: python3 -c "import json, sys; json.load(open('plugin-index.json'))" || { echo "Invalid JSON"; exit 1; }
