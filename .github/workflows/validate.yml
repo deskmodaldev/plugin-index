@@ -38,9 +38,9 @@ jobs:
                       errors.append(f"Entry {i}: missing required field '{field}'")
 
               if "owner" in entry and "repo" in entry:
-                  key = f"{entry['owner']}/{entry['repo']}"
+                  key = f"{entry['owner']}/{entry['repo']}/{entry.get('name','')}"
                   if key in seen:
-                      errors.append(f"Entry {i}: duplicate owner/repo '{key}'")
+                      errors.append(f"Entry {i}: duplicate entry '{key}'")
                   seen.add(key)
 
               if "categories" in entry:
