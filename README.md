@@ -1,6 +1,6 @@
 # DeskModal Plugin Index
 
-Curated list of plugins for the [DeskModal](https://github.com/deskmodaldev/deskmodal) App Market.
+Curated list of plugins for the [DeskModal](https://github.com/Desk-Modal/deskmodal) App Market.
 
 DeskModal discovers available plugins by fetching `plugin-index.json` from this repository. Each entry points to a GitHub repository that publishes plugin releases.
 
@@ -21,7 +21,7 @@ DeskModal discovers available plugins by fetching `plugin-index.json` from this 
 
 ```json
 {
-  "owner": "deskmodaldev",
+  "owner": "Desk-Modal",
   "repo": "plugin-tradesurface-chart",
   "name": "TradeSurface Chart",
   "description": "Advanced multi-asset charting with 50+ indicators and drawing tools",

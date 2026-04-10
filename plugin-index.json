@@ -1,82 +1,102 @@
 [
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Feeds",
     "description": "Real-time multi-exchange price feeds with WebSocket streaming",
-    "categories": ["Data"],
+    "categories": [
+      "Data"
+    ],
     "featured": true
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Chart",
     "description": "Advanced multi-asset charting with 50+ indicators and drawing tools",
-    "categories": ["Charting"],
+    "categories": [
+      "Charting"
+    ],
     "featured": true
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Watchlist",
     "description": "Multi-exchange watchlist with streaming quotes and sections",
-    "categories": ["Trading"],
+    "categories": [
+      "Trading"
+    ],
     "featured": true
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Depth",
     "description": "Cross-exchange order book depth visualization with aggregation",
-    "categories": ["Trading"],
+    "categories": [
+      "Trading"
+    ],
     "featured": false
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Analytics",
     "description": "Market analytics, correlation analysis, and cross-exchange metrics",
-    "categories": ["Analytics"],
+    "categories": [
+      "Analytics"
+    ],
     "featured": false
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Screener",
     "description": "Real-time market screener with custom filters and sorting",
-    "categories": ["Trading"],
+    "categories": [
+      "Trading"
+    ],
     "featured": false
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Alerts",
     "description": "Price alerts and condition monitoring with notification delivery",
-    "categories": ["Trading"],
+    "categories": [
+      "Trading"
+    ],
     "featured": false
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "tradesurface",
     "name": "TradeSurface Trading",
     "description": "Order ticket, blotter, and positions management",
-    "categories": ["Trading"],
+    "categories": [
+      "Trading"
+    ],
     "featured": true
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "price-feed-service",
     "name": "Price Feed Service",
     "description": "Exchange connectivity, tick normalization, and FDC3 price distribution",
-    "categories": ["Services"],
+    "categories": [
+      "Services"
+    ],
     "featured": false
   },
   {
-    "owner": "deskmodaldev",
+    "owner": "Desk-Modal",
     "repo": "paper-trading",
     "name": "Paper Trading Engine",
     "description": "Simulated order execution, positions tracking, P&L calculation, and execution analytics",
-    "categories": ["Services"],
+    "categories": [
+      "Services"
+    ],
     "featured": false
   }
 ]
